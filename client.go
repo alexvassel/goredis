@@ -18,6 +18,7 @@ func (opentracingHook) BeforeProcess(ctx context.Context, cmd redis.Cmder) (cont
 	span, _ := opentracing.StartSpanFromContext(ctx, spanName)
 	ext.DBType.Set(span, "redis")
 	ext.DBStatement.Set(span, fmt.Sprintf("%v", cmd.Args()))
+	ctx = opentracing.ContextWithSpan(ctx, span)
 
 	return ctx, nil
 }
@@ -33,6 +34,7 @@ func (opentracingHook) BeforeProcessPipeline(ctx context.Context, cmds []redis.C
 	dbMethod := formatCommandsAsDbMethods(cmds)
 	ext.DBType.Set(span, "redis")
 	ext.DBStatement.Set(span, fmt.Sprintf("%v", dbMethod))
+	ctx = opentracing.ContextWithSpan(ctx, span)
 	return ctx, nil
 }
 
